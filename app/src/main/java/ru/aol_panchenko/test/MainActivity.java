@@ -31,14 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static Api api;
-    private Retrofit retrofit;
     private List<String> urlList;
     private RecyclerView recyclerView;
-    private Adapter adapter;
-    private RxJavaCallAdapterFactory rxJavaCallAdapterFactory;
     GridLayoutManager gridLayoutManager;
-    private boolean isTablet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         urlList = new ArrayList<>();
 
+        boolean isTablet;
         // Определяю размер экрана и задаю переменную отвечающую за тип устройства
         int screenSize = getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK;
@@ -67,18 +63,19 @@ public class MainActivity extends AppCompatActivity {
             gridLayoutManager = new GridLayoutManager(this, 3);
         }
         recyclerView.setLayoutManager(gridLayoutManager);
-        adapter = new Adapter(urlList, width, isTablet, this);
+        Adapter adapter = new Adapter(urlList, width, isTablet, this);
         recyclerView.setAdapter(adapter);
 
-        rxJavaCallAdapterFactory = RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
+        RxJavaCallAdapterFactory rxJavaCallAdapterFactory =
+                RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
 
-        retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://devcandidates.alef.im/list.php/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(rxJavaCallAdapterFactory)
                 .build();
 
-        api = retrofit.create(Api.class);
+        Api api = retrofit.create(Api.class);
 
         Subscription subscription = api.getImages()
                 .observeOn(AndroidSchedulers.mainThread())
