@@ -23,67 +23,31 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
 
     private List<String> urls;
     private Context context;
-    private int screenSize;
     private boolean isTablet;
     private int width;
-    private int count;
 
-    public Adapter(List<String> urls, Activity context) {
+    public Adapter(List<String> urls, int width, boolean isTablet, Activity context) {
         this.urls = urls;
+        this.width = width;
+        this.isTablet = isTablet;
         this.context = context;
-        // Определяю размер экрана и задаю переменную отвечающую за тип устройства
-        screenSize = context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK;
-        if(screenSize == Configuration.SCREENLAYOUT_SIZE_LARGE ||
-                screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE){
-            isTablet = true;
-            context.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }else {
-            isTablet = false;
-            context.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-        Display display = context.getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        width = size.x;
-        count = 0;
+
     }
 
     @Override
     public Adapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.image, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(Adapter.ViewHolder holder, int position) {
         if(!isTablet){
-            // Увеличиваю позицию вручнаю на каждой итерации чтобы картинки не повторялись
-            if(position > 0 && position < urls.size()-1){
-                count ++;
-                position += count;
-            }
             String urlImage1 = urls.get(position);
-            Picasso.with(context).load(urlImage1).resize((width/2) - 48, (width/2) - 48).into(holder.image1);
-            if(position < urls.size()-1){
-                String urlImage2 = urls.get(position+1);
-                Picasso.with(context).load(urlImage2).resize((width/2) - 48, (width/2) - 48).into(holder.image2);
-            }
+            Picasso.with(context).load(urlImage1).resize((width/2) - 32, (width/2) - 32).into(holder.image);
         }else {
-            if(position > 0 && position < urls.size()-2){
-                count += 2;
-                position += count;
-            }
             String urlImage1 = urls.get(position);
-            Picasso.with(context).load(urlImage1).resize((width/3) - 64, (width/2) - 64).into(holder.image1);
-            if(position < urls.size()-1){
-                String urlImage2 = urls.get(position+1);
-                Picasso.with(context).load(urlImage2).resize((width/3) - 64, (width/2) - 64).into(holder.image2);
-                if(position < urls.size()-2){
-                    String urlImage3 = urls.get(position+2);
-                    Picasso.with(context).load(urlImage3).resize((width/3) - 64, (width/2) - 64).into(holder.image3);
-                }
-            }
+            Picasso.with(context).load(urlImage1).resize((width/3) - 48, (width/3) - 48).into(holder.image);
         }
     }
 
@@ -92,23 +56,19 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
         if(urls == null){
             return 0;
         }else if(isTablet){
-            return urls.size()/3;
+            return urls.size();
         }else{
-            return urls.size()/2;
+            return urls.size();
         }
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView image1, image2, image3;
+        ImageView image;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            image1 = (ImageView) itemView.findViewById(R.id.image1);
-            image2 = (ImageView) itemView.findViewById(R.id.image2);
-            if(isTablet){
-                image3 = (ImageView) itemView.findViewById(R.id.image3);
-            }
+            image = (ImageView) itemView.findViewById(R.id.imageView);
         }
     }
 }
